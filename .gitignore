@@ -1,17 +1,5 @@
 # Added entries by Sjoerd & Reinier
-datasets/CFD/cfd_image/*.jpg
-datasets/CFD/cfd_image/*.png
-datasets/CFD/seg_gt/*.jpg
-datasets/CFD/seg_gt/*.png
-datasets/CRACK500/crack_image/*.jpg
-datasets/CRACK500/crack_image/*.png
-datasets/CRACK500/seg_gt/*.jpg
-datasets/CRACK500/seg_gt/*.png
-model_parameters_gpu.pt
-model_parameters_gpu_test.pt
 model_parameters.pt
-model_parameters_CFD.pt
-model_parameters_C5D.pt
 metrics.csv
 
 # Discard google drive 
