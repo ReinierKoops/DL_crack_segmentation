@@ -58,7 +58,7 @@ def get_data_loaders(bs_train, bs_test, img_factor=1, dataset="CFD"):
         dataset = load_dataset(current_path + image, tf_compos, current_path + gt, tf_compos_gt)
 
     print(f"dataset len: {len(dataset)}")
-    train_data, test_data = random_split(dataset, ratio)
+    train_data, test_data = random_split(dataset, ratio, generator=torch.Generator().manual_seed(42))
     train_loader = DataLoader(train_data, batch_size=bs_train)
     test_loader = DataLoader(test_data, batch_size=bs_test)
 
