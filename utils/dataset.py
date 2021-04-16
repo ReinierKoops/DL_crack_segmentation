@@ -57,9 +57,6 @@ def get_data_loaders(bs_train, bs_test, img_factor=1, dataset="CFD"):
     train_loader = DataLoader(train_data, batch_size=bs_train)
     test_loader = DataLoader(test_data, batch_size=bs_test)
 
-    print(f"=====\nTrain objects: {len(train_data)}, batch size: {bs_train}, batches: {len(train_loader)}")
-    print(f"Test objects: {len(test_data)}, batch size: {bs_test}, batches: {len(test_loader)}\n=====")
-
     return dataset, train_loader, test_loader
 
 
