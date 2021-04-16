@@ -8,7 +8,7 @@ import torch
 import os
 
 
-def get_data_loaders(split_seed, bs_train, bs_test, img_factor=1, dataset="CFD"):
+def get_data_loaders(bs_train, bs_test, img_factor=1, dataset="CFD"):
     # Define standard variables
     current_path = os.path.abspath(os.getcwd())
     image = "/CFD/cfd_image/"
@@ -29,8 +29,7 @@ def get_data_loaders(split_seed, bs_train, bs_test, img_factor=1, dataset="CFD")
     # Manual seed added such that same split is kept,
     # even though a new split is made with different sizes
     print(f"dataset len: {len(dataset)}")
-    train_data, test_data = random_split(dataset, ratio,
-                                         generator=torch.Generator().manual_seed(split_seed))
+    train_data, test_data = random_split(dataset, ratio)
     train_loader = DataLoader(train_data, batch_size=bs_train)
     test_loader = DataLoader(test_data, batch_size=bs_test)
 
