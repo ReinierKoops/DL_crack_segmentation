@@ -1,11 +1,42 @@
+import torch
+import glob
+import os
+
 from torch.utils.data import random_split
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from torchvision.transforms.functional import InterpolationMode
-from datasets.CFD.CFDdata import CFD
-from datasets.CRACK500.CRACKdata import C5D
-import torch
-import os
+from torch.utils.data import Dataset
+from PIL import Image
+
+
+class load_dataset(Dataset):
+    def __init__(self, img_dir, img_transform, mask_dir, mask_transform):
+        self.img_dir = img_dir
+        self.img_fnames = sorted(glob.glob(os.path.join(img_dir, "*.jpg")))
+        self.img_transform = img_transform
+
+        self.mask_dir = mask_dir
+        self.mask_fnames = sorted(glob.glob(os.path.join(mask_dir, "*.png")))
+        self.mask_transform = mask_transform
+
+    def __getitem__(self, i: int):
+        fpath = self.img_fnames[i]
+        img = Image.open(fpath).convert("RGB")
+        state = torch.get_rng_state()
+        if self.img_transform is not None:
+            img = self.img_transform(img)
+
+        mpath = self.mask_fnames[i]
+        mask = Image.open(mpath).convert("1")
+        torch.set_rng_state(state)
+        if self.mask_transform is not None:
+            mask = self.mask_transform(mask)
+
+        return img, mask
+
+    def __len__(self):
+        return len(self.img_fnames)
 
 
 def get_data_loaders(bs_train, bs_test, img_factor=1, dataset="CFD"):
@@ -22,12 +53,10 @@ def get_data_loaders(bs_train, bs_test, img_factor=1, dataset="CFD"):
 
     tf_compos, tf_compos_gt = get_transforms(img_factor)
     if dataset == "CFD":
-        dataset = CFD(current_path + image, tf_compos, current_path + gt, tf_compos_gt)
+        dataset = load_dataset(current_path + image, tf_compos, current_path + gt, tf_compos_gt)
     else:
-        dataset = C5D(current_path + image, tf_compos, current_path + gt, tf_compos_gt)
+        dataset = load_dataset(current_path + image, tf_compos, current_path + gt, tf_compos_gt)
 
-    # Manual seed added such that same split is kept,
-    # even though a new split is made with different sizes
     print(f"dataset len: {len(dataset)}")
     train_data, test_data = random_split(dataset, ratio)
     train_loader = DataLoader(train_data, batch_size=bs_train)
@@ -60,7 +89,6 @@ def get_transforms(img_factor):
         transforms.ToTensor()
     ])
     # NN interpolation since value can only be [0 or 1],
-    # Bilinear, should be tested at some point, however.
     tf_compos_gt = transforms.Compose([
         transforms.Resize(resize_image, interpolation=InterpolationMode.NEAREST),
         *shared_transforms,
